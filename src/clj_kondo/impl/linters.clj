@@ -2,6 +2,7 @@
   {:no-doc true}
   (:require
    [clj-kondo.impl.analysis :as analysis]
+   [clojure.tools.logging :refer [log]]
    [clj-kondo.impl.config :as config]
    [clj-kondo.impl.findings :as findings]
    [clj-kondo.impl.namespace :as namespace]
@@ -211,7 +212,9 @@
         linted-namespaces (:linted-namespaces idacs)]
     ;; (prn :from-cache from-cache)
     (doseq [ns (namespace/list-namespaces ctx)
-            :let [base-lang (:base-lang ns)]
+            :let [;; _ (println (str "lint-var-usage: ns = " (:filename ns)))
+                  ;; _ (def vns1 ns)
+                  base-lang (:base-lang ns)]
             call (:used-vars ns)
             :let [;; _ (clojure.pprint/pprint (dissoc call :config))
                   call? (= :call (:type call))
@@ -271,7 +274,11 @@
                                    (not= (:top-ns call) (:top-ns called-fn)))
                   row-called-fn (:row called-fn)
                   row-call (:row call)
-                  valid-call? (or (not unresolved?)
+                  ;; _ (do
+                      ;; (def vrow-call row-call)
+                      ;; (def vrow-called-fn row-called-fn))
+                  valid-call? (or (not row-call)
+                                  (not unresolved?)
                                   (when called-fn
                                     (or different-file?
                                         (not row-called-fn)
@@ -615,4 +622,8 @@
 ;;;; scratch
 
 (comment
+  (-> vns1
+      keys)
+  vrow-called-fn
+  vrow-call
   )
